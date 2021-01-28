@@ -2,11 +2,12 @@
 body
 {
 width: 800px; margin: 0 auto; 
-background: no-repeat centre;
+background-repeat: no-repeat;
 background-image: url("https://dport96.github.io/ITM352/morea/030.ui-basics/phone_globe.jpg")
+
 }
 /* Typography */ 
-image
+img
 {
 height: "200px"; width:"200px"
 }
