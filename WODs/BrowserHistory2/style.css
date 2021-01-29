@@ -1,12 +1,22 @@
-h1,h1
+h1,h2
 {
 
-font-family: 'Oswald', sans;
-
+    font-family: 'Oswald', sans;
+    color: darkblue
 }
 body
 {
-color:darkblue;
-font-family: 'Open Sans', sans;
+   
+    font-family: 'Open Sans', sans;
+    color:darkblue;
+    margin: 10px 50px 10px 50px;
+    width: 950px;
+    background-color: ivory;
 
+
+}
+img
+{
+
+    float: left;
 }
