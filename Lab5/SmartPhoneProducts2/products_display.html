@@ -5,12 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title> SmartphoneStore Home</title>
 <link rel="stylesheet" type="text/css" href="products-style.css">
+<script>
+var name = "Nicholas Samson";
+const store_name = "Nicholas Samson"
+</script>
 </head>
 <body>
 
     <h1>
-        Used Smartphone Store
+        <script>document.write(name);</script>'s Used Smartphone Store
     </h1>
+    <p style="text-align: center; font-weight: bold;">
+        Hits:<span id="hits_span">0</span>
+        Spins:<span id="spins_span">0</span>
+        </p>
+        
         <div><main>
             
     <section class="item" onmouseover="this.className = 'item rotate';" onclick = "this.className='item'">
@@ -45,4 +54,17 @@
     </h1>
     
 </body>
+
+<footer>\
+    <h1>
+        <script>document.write(name);</script>'s Used Smartphone Store
+    </h1>
+</footer>
 </html>
+
+<script>
+    var hits = 10;
+    var spins = 20;
+    hits_span.innerHTML = hits;
+    spins_span.innerHTML = spins;
+</script>
