@@ -1,0 +1,66 @@
+<script>
+    var product1 ={
+         brand : "HTC",
+         price : 40.00,
+         image : "http://dport96.github.io/ITM352/morea/080.flow-control-II/HTC.jpg",
+        };
+    var product2 ={
+         brand : "Apple",
+         price : 75.00,
+         image : "http://dport96.github.io/ITM352/morea/080.flow-control-II/iphone-3gs.jpg",
+    };
+    var product3 ={
+         brand : "Nokia",
+         price : 35.00,
+         image : "http://dport96.github.io/ITM352/morea/080.flow-control-II/Nokia.jpg",
+    };
+     var product4 ={
+         brand : "Samsung",
+         price : 45.00,
+         image : "http://dport96.github.io/ITM352/morea/080.flow-control-II/Samsung.jpg",
+    };
+    var product5 ={
+         brand : "Blackberry",
+         price : 10.00,
+         image : "http://dport96.github.io/ITM352/morea/080.flow-control-II/Blackberry.jpg",
+    };
+
+products = [product1,product2,product3,product4,product5];
+</script>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> SmartphoneStore Home</title>
+<link rel="stylesheet" type="text/css" href="products-style.css">
+</head>
+<body>
+
+    <h1>
+        Used Smartphone Store
+    </h1>
+        <div><main>
+<script>
+    for(x=0;x <= products.length;x++)
+    {
+    document.write(`
+    <section class="item">
+        <h2>${products[x].brand}</h2>
+        <p>${products[x].price}</p>
+        <img src= "${products[x].image}">
+    </section>
+    `);
+
+}
+</script>
+</main>
+</div>
+    <h1>
+    Your One Stop Phone Shop  
+    </h1>
+    
+</body>
+</html>
