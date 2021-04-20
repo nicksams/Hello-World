@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS Template</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<!--Style for the page-->
+<style>
+body,h1 {font-family: "Raleway", sans-serif}
+.bgimg {
+background-image:url('images/loginpage.gif');
+background-repeat: no-repeat;
+background-size: 1000px;
+height: 1000px;
+background-position: center;
+}
+div.b {
+    text-align: center;
+    height: 200px;
+    width: 400px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -250px;
+    margin-left: -200px;
+    color: white
+} 
+</style>
+<script>
+    let params = (new URL(document.location)).searchParams;
+    window.onload = function () {
+    // if there are errors with the log in create an alert
+        if (params.has('loginError')) {
+            alert('Invalid Username or Passowrd');
+        }
+    }
+</script>
+<div class = "bgimg"><!--Sets Background style-->
+<body>
+    <div class ="b"><!--Formats based body content-->
+        <!--borrowed from https://www.w3schools.com/howto/howto_css_login_form.asp-->
+        <h1>Log in Here</h1>
+         <h2>Please log in here if you are an existing user.</h2>
+         <form name="login" action="process_login" method="POST">
+            <div class="container"><br>
+             <input type="text" name="username" id="username" size="40" placeholder="Enter Username" required><br><!--Sets the input type to a textbox with credentials to allow user text-->
+             <input type="password" name="password" size="40" placeholder="Enter Password" onkeyup="" required><br> <!--Sets the input to become a password and allows the return of a "password" to be used in further instances-->
+             <input type="submit" value="Login" name="login"><br><!--Sets the imput to return the login value as a "login" so we can refer to this data as a user login-->
+                <div style="margin-left: auto; margin-right: auto;">
+                <p>Register Here!</p>
+                <input type="button" name="newuser" value="New Users register Here" onclick="window.location='./register.html' + document.location.search"><!--Same things as above-->
+                </div>
+            </div>
+        </div>
+        <!--borrowed from https://www.w3schools.com/howto/howto_css_login_form.asp-->
+</style>
+        </form>
+<script>
+login.action += document.location.search; // action plus the query string so info won't be lost from the intitial display page
+</script>
+</body>
+    </div>
+</html>

@@ -1,0 +1,29 @@
+{
+    "dport": {"name": "Dan Port", "password": "portspassword", "email": "dport@hawaii.edu"},
+    "kazman": {"name": "Rick Kazman", "password": "kazmanpassword", "email": "kazman@hawaii.edu"},
+    "itm352": {"name": "ITM 352", "password": "grader", "email": "itm352@hawaii.edu"}
+    }
+    var user_data_fille = `./user_data.json`;
+    if(fs.existsSync(user_data_file)){
+        var file_stats = fs.statSync(user_data_file);
+        console.log(`${user_data_file} has ${file_stats["size"]} characters);
+        var user_data = JSON.parse(fs.readFileSSync(user_data_file, 'utf-8'));
+    } else {
+        console.log(`${user_data_file} does not exist!`);
+    }
+
+
+    app.post("/login", function (request, response) {
+        // Process login form POST and redirect to logged in page if ok, back to login page if not
+    console.log(request.body);
+    let username_entered = request.body["username"];
+    let password_entered = request["password";
+    if(type user_data[username_entered] != 'undefined'){
+        if(user_data[username_entered]['password'] == password_entered){
+        response.send(`${username_entered} is logged in`);
+        } else{
+            response.send(`${username_entered} password wrong`);
+        }
+    }
+    });
+    
