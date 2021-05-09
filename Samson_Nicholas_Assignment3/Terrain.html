@@ -1,0 +1,198 @@
+<script src = "product_data.js"> </script>
+<script>var products_array = "product_data.js"</script>
+<!DOCTYPE html>
+<html>
+<title>W3.CSS Template</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Karma">
+<style>
+body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
+.w3-bar-block .w3-bar-item {padding:20px}
+</style>
+<script>
+  function checkQuantityTextbox(theTextbox) {
+      errs = isNonNegInt(theTextbox.value, true); // runs  isNonNegInt on the thetextbox value and if resutns true contines.
+      if (errs.length == 0) errs = ['You want:'];// if there are no errors set the value to 'You Want'
+      if (theTextbox.value.trim() == '') errs = ['Quantity:'];
+      document.getElementById(theTextbox.name + '_label').innerHTML=errs.join(',');//Finally sets the textbox to what the errors are or are not found.
+    }
+
+ function isNonNegInt(q, return_errors = false) {
+        errors = []; // assume no errors at first
+        if(q == '') q =0; // handle blank inputs as if they are 0
+        if (Number(q) != q) errors.push('<font color="red">Not a number!</font>'); // Check if string is a number value
+        else if (q < 0) errors.push('<font color="red">Negative value!</font>'); // Check if it is non-negative
+        else if (parseInt(q) != q) errors.push('<font color="red">Not an integer!</font>'); // Check that it is an integer
+        return return_errors ? errors : (errors.length == 0);
+    }  
+  window.onload = function () {
+        let params = (new URL(document.location)).searchParams; // get the query string which has the form data
+        // form was submitted so check that quantities are valid then redirect to invoice if ok.
+        if (params.has('purchase_submit')) {
+            has_errors = false; // assume quantities are valid from the start
+            total_qty = 0; // need to check if something was selected so we will look if the total > 0
+            for (i = 0; i < products.length; i++) {
+                if (params.has(`quantity${i}`)) {//checks if the paramaters 'has' the value of the quantity of i and then continues
+                    a_qty = params.get(`quantity${i}`);// if there is a quantitiy sets the value of that quantity to the a_qty
+                    // make textboxes sticky in case of invalid data
+                    product_selection_form[`quantity${i}`].value = a_qty; // finally sets the quantity to the area in the form
+                    total_qty += a_qty;  // adds the current quantity to the total quantities there are.
+                    if(!isNonNegInt(a_qty)) { //if the value returns false then this will run instead
+                        has_errors = true; // oops, invalid quantity
+                        checkQuantityTextbox(product_selection_form[`quantity${i}`]); // show where the error is
+                    }
+                }
+            }
+            // Now respond to errors or redirect to invoice if all is ok
+            if(has_errors) {// if the above runs and it returns has_errors we will run this alert
+                alert("Please enter only valid quantities!");
+            } else if(total_qty == 0) { // no quantity selections, just give a general alert
+                alert("Please select some quantities!");
+            } else { // all good to go!
+                window.location = `./order_display.html${document.location.search}`; //finally the window will load the order_display html where the document is pushed and processed to yourself.
+                window.stop;
+            }
+        }
+    }
+function savetocart(){
+  var cartdata = {};
+  if(true){
+    var quantitycheck = document.getElementById('quantity').value
+    if (isNonNegInt(quantitycheck, false)){
+      var cartsession = `cartproducts${3}`;
+      cartdata.product=products[3]['brand'];
+      cartdata.quantity=document.getElementById('quantity').value;
+      var data = JSON.stringify(cartdata);
+      sessionStorage.setItem(cartsession,data);
+      location.reload
+    }
+  }
+}
+</script>
+<body>
+<form name="product_selection_form" action="process_form" method="POST"> 
+<!-- Sidebar (hidden by default) -->
+<nav class="w3-sidebar w3-bar-block w3-card w3-top w3-xlarge w3-animate-left" style="display:none;z-index:2;width:40%;min-width:300px" id="mySidebar">
+  <a href="javascript:void(0)" onclick="w3_close()"
+  class="w3-bar-item w3-button">Close Menu</a>
+  <a href="" onclick="w3_close()" class="w3-bar-item w3-button">About</a>
+  <a href="http://localhost:8080/Ficus.html" onclick="w3_close()" class="w3-bar-item w3-button">Ficus</a>
+  <a href="http://localhost:8080/Monstera.html" onclick="w3_close()" class="w3-bar-item w3-button">Monstera</a>
+  <a href="http://localhost:8080/Pothos.html" onclick="w3_close()" class="w3-bar-item w3-button">Pothos</a>
+  <a href="http://localhost:8080/Terrain.html" onclick="w3_close()" class="w3-bar-item w3-button">Terrain</a>
+  <a href="http://localhost:8080/Cart.html" onclick="w3_close()" class="w3-bar-item w3-button">Cart</a>
+  <a href="http://localhost:8080/Login.html" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
+  <a href="http://localhost:8080/Register.html" onclick="w3_close()" class="w3-bar-item w3-button">Register</a>
+</nav>
+
+<!-- Top menu -->
+<div class="w3-top">
+  <div class="w3-white w3-xlarge" style="max-width:1200px;margin:auto">
+    <div class="w3-button w3-padding-16 w3-left" onclick="w3_open()">☰</div>
+    <div class="w3-right w3-padding-16">❀♥❀♥❀</div>
+    <div class="w3-center w3-padding-16">✿Welcome!✿</div>
+  </div>
+</div>
+
+<!-- !PAGE CONTENT! -->
+<hr id="plants">
+<div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
+
+
+  <!-- First Photo Grid-->
+  <script>
+    // checks the js data for images and brand names to load to the body
+    //loads brand name to the page
+    // loads the price to the page
+    // when accessing the label assigns the label to a specific label ID that is used when we run the checkQuantityInbox function
+    // we are checking the input here and assigning it to an object that is processed by us as we have all the information in our js.
+  if(true) {
+  document.write(`
+    <div class = "w3-quarter">
+    <img src="${products[3].image}" alt=${products[3].brand} style=width="200" height="200"> 
+    <h3>${products[3].brand}</h3>
+    <p>${products[3].desc}</p>
+    <h3>$${products[3].price}</h3>
+    <label id="quantity${3}_label"}">Quantity:</label>
+    <input type="text" placeholder="0" id="quantity" name="quantity${3}" onkeyup="checkQuantityTextbox(this);">
+    </div>
+ `);
+}    
+</script>
+</div>
+
+</hr>
+<input type="button" value="Add to Cart" onclick="savetocart();">Add to Cart! </input>
+  <!-- Calculate Button -->
+    <div class="w3-main w3-content w3-padding" style="text-align: center; margin-top: 500px;"> 
+    <button type="submit" name="purchase_submit">Calculate Total!</button>
+    </div>
+
+  
+  <hr id="about">
+
+  <!-- About Section -->
+  <div class="w3-container w3-padding-32 w3-center">  
+    <h3>Me the Loaf</h3><br>
+    <img src="images/sleepy.JPG" alt="Me" class="w3-image" style="display:block;margin:auto" width="200" height="200">
+    <div class="w3-padding-32">
+      <h4><b>Bark!</b></h4>
+      <h6><i>🌾🌿🍃 for Everyone!</i></h6>
+      <p>Studies show that people who spend time cultivating plants have less stress in their lives. Plants soothe human beings and provide a positive way for people to channel their stress into nurturing. Therapeutic Effects of Gardening.</p>
+    </div>
+  </div>
+  <hr>
+  
+  <!-- Footer -->
+  <footer class="w3-row-padding w3-padding-32">
+    <div class="w3-third">
+      <h3>Shiba's Rule</h3>
+      <p>Bark Bark</p>
+      <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+    </div>
+  
+    <div class="w3-third">
+      <h3>Doge Corner</h3>
+      <ul class="w3-ul w3-hoverable">
+        <li class="w3-padding-16">
+          <img src="images/doge.jpg" class="w3-left w3-margin-right" style="width:75px">
+          <span class="w3-large">Bark</span><br>
+          <span>Bark</span>
+        </li>
+        <li class="w3-padding-16">
+          <img src="images/doge1.jpg" class="w3-left w3-margin-right" style="width: 75px">
+          <span class="w3-large">Bark</span><br>
+          <span>Bark</span>
+        </li> 
+      </ul>
+    </div>
+
+    <div class="w3-third w3-serif">
+      <h3>Bark</h3>
+      <p>
+        <span class="w3-tag w3-black w3-margin-bottom">Bark</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Bark</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Bark</span>
+        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Bark</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Bark</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Bark</span>
+        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Bark</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Bark</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Bark</span>
+      
+      </p>
+    </div>
+  </footer>
+
+<!-- End page content -->
+</div>
+
+<script>
+// Script to open and close sidebar
+function w3_open() {
+  document.getElementById("mySidebar").style.display = "block";
+}
+ 
+function w3_close() {
+  document.getElementById("mySidebar").style.display = "none";
+}
+</script>
+</form>
+</body>
+</html>

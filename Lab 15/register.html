@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <!--Styles the page-->
+<style>
+ body,h1 {font-family: "Raleway", sans-serif}
+.bgimg {
+ background-image:url('images/loginpage.gif');
+ background-repeat: no-repeat;
+ background-size: 1000px;
+height: 1000px;
+ background-position: center;
+ }
+div.b {
+text-align: center;
+height: 200px;
+width: 400px;
+position: absolute;
+top: 50%;
+left: 50%;
+margin-top: -225px;
+margin-left: -200px;
+color: white
+} 
+
+</style>
+
+
+<script>//From Lab 13 and 14 and Screencast.
+    let params = (new URL(document.location)).searchParams; 
+    window.onload = function () {//If there are errors on load inform the user
+        if (params.has('errors')) {
+            console.log("invalid");
+            alert('Fix the following errors: \n' + params.get('errors'));
+        }
+    }    
+</script>
+
+<div class = "bgimg">
+<body>
+    <div class ="b">
+    <!--//borrowed from w3 schools,StackOverflow https://www.w3schools.com/howto/howto_css_register_form.asp-->  
+    <h1>Make an account first!</h1>
+    <div> 
+        <form method="POST" action="process_register" name="register">
+            <input type="text" name="fullname" size="40" pattern="[a-zA-Z]+[ ]+[a-zA-Z]+"
+                placeholder="Enter First & Last Name"><br />
+            <input type="text" name="username" size="40" pattern="^[a-zA-Z0-9]{3,10}$" required
+                title="Minimum 4 Characters, Maximum 10 Characters, Numbers/Letters Only"
+                placeholder="Enter Username"><br />
+            <input type="email" name="email" size="40" placeholder="Enter Email"
+                pattern="[a-z0-9._]+@[a-z0-9]+\.[a-z]{3,}$" required title="Please enter valid email."><br/>
+            <input type="password" id="password" name="password" size="40" pattern=".{5,}" required
+                title="6 Characters Minimum" placeholder="Enter Password"><br />
+            <input type="password" id="repeat_password" name="repeat_password" size="40" pattern=".{5,}" required
+                title="6 Characters Minimum" placeholder="Repeat Password"><br />
+                <input type="submit" value="Register" id="submit">
+        </form>
+        <div style="margin-left: auto; margin-right: auto;">
+          <h2>If you have an account log in!</h2>
+            <input type="button" name="existingaccount" value="Click here to log-in" onclick="window.location='./login.html' + document.location.search;">
+        </div>
+    </div>
+    <script>
+        register.action += document.location.search; // Saves the query String like before in the login page
+    </script>
+    </div>
+</body>
+</div>
+</html>
