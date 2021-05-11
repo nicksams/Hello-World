@@ -1,21 +1,28 @@
+<script src="product_data.js"> </script>
+<script>var products_array = "product_data.js"</script>
 <!DOCTYPE html>
 <html>
-<title>W3.CSS Template</title>
+<title>✿Welcome!✿</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Karma">
 <!--Style for the page-->
 <style>
-body,h1 {font-family: "Raleway", sans-serif}
-.bgimg {
-background-image:url('images/loginpage.gif');
-background-repeat: no-repeat;
-background-size: 1000px;
-height: 1000px;
-background-position: center;
-}
-div.b {
+  body,
+  h1 {
+    font-family: "Raleway", sans-serif
+  }
+
+  .bgimg {
+    background-image: url('images/loginpage.gif');
+    background-repeat: no-repeat;
+    background-size: 1000px;
+    height: 1000px;
+    background-position: center;
+  }
+
+  div.b {
     text-align: center;
     height: 200px;
     width: 400px;
@@ -25,37 +32,50 @@ div.b {
     margin-top: -250px;
     margin-left: -200px;
     color: white
-} 
+  }
 
-body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
-.w3-bar-block .w3-bar-item {padding:20px}
+  body,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Karma", sans-serif
+  }
+
+  .w3-bar-block .w3-bar-item {
+    padding: 20px
+  }
 </style>
 <script>
-    //From Lab 13 and 14
-    let params = (new URL(document.location)).searchParams;
-    window.onload = function () {
-        if (params.has('loginError')) {//checks if there are errors on loading of the page
-            alert('Invalid Username or Password');
-        }
+  //From Lab 13 and 14
+  let params = (new URL(document.location)).searchParams;
+  window.onload = function () {
+    if (params.has('loginError')) {//checks if there are errors on loading of the page
+      alert('Invalid Username or Password');
     }
+  }
+
 </script>
-<div class = "bgimg"><!--Sets Background style-->
-<body>
+<div class="bgimg">
+  <!--Sets Background style-->
+
+  <body>
     <!-- Sidebar (hidden by default) -->
-<nav class="w3-sidebar w3-bar-block w3-card w3-top w3-xlarge w3-animate-left" style="display:none;z-index:2;width:40%;min-width:300px" id="mySidebar">
-    <a href="javascript:void(0)" onclick="w3_close()"
-    class="w3-bar-item w3-button">Close Menu</a>
-    <a href="" onclick="w3_close()" class="w3-bar-item w3-button">About</a>
-    <a href="http://localhost:8080/Ficus.html" onclick="w3_close()" class="w3-bar-item w3-button">Ficus</a>
-    <a href="http://localhost:8080/Monstera.html" onclick="w3_close()" class="w3-bar-item w3-button">Monstera</a>
-    <a href="http://localhost:8080/Pothos.html" onclick="w3_close()" class="w3-bar-item w3-button">Pothos</a>
-    <a href="http://localhost:8080/Terrain.html" onclick="w3_close()" class="w3-bar-item w3-button">Terrain</a>
-    <a href="http://localhost:8080/Cart.html" onclick="w3_close()" class="w3-bar-item w3-button">Cart</a>
-    <a href="http://localhost:8080/Login.html" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
-    <a href="http://localhost:8080/Register.html" onclick="w3_close()" class="w3-bar-item w3-button">Register</a>
-  </nav>
-<!-- Top menu -->
-<div class="w3-top">
+    <!--Same format as login and index pages, functions the same as Assignment2-->
+    <nav class="w3-sidebar w3-bar-block w3-card w3-top w3-xlarge w3-animate-left"
+      style="display:none;z-index:2;width:40%;min-width:300px" id="mySidebar">
+      <a href="javascript:void(0)" onclick="w3_close()" class="w3-bar-item w3-button">Close Menu</a>
+      <a href="./index.html" onclick="w3_close()" class="w3-bar-item w3-button">Home</a>
+      <a href="./login.html" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
+      <a href="./register.html" onclick="w3_close()" class="w3-bar-item w3-button">Register</a>
+
+    </nav>
+    </>
+  </body>
+  </body <!-- Top menu -->
+  <div class="w3-top">
     <div class="w3-white w3-xlarge" style="max-width:1200px;margin:auto">
       <div class="w3-button w3-padding-16 w3-left" onclick="w3_open()">☰</div>
       <div class="w3-right w3-padding-16">❀♥❀♥❀</div>
@@ -63,36 +83,47 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
     </div>
   </div>
 
-    <div class ="b"><!--Formats based body content-->
-        <!--borrowed from https://www.w3schools.com/howto/howto_css_login_form.asp-->
-        <h1>Log in Here</h1>
-         <h2>Please log in here if you are an existing user.</h2>
-         <!--Lab 13-->
-         <form name="login" action="process_login" method="POST">
-            <div class="container"><br>
-             <input type="text" name="username" id="username" size="40" placeholder="Enter Username" required><br><!--Sets the input type to a textbox with credentials to allow user text-->
-             <input type="password" name="password" size="40" placeholder="Enter Password" onkeyup="" required><br> <!--Sets the input to become a password and allows the return of a "password" to be used in further instances-->
-             <input type="submit" value="Login" name="login"><br><!--Sets the imput to return the login value as a "login" so we can refer to this data as a user login-->
-                <div style="margin-left: auto; margin-right: auto;">
-                <p>Register Here!</p>
-                <input type="button" name="newuser" value="New Users register Here" onclick="window.location='./register.html' + document.location.search"><!--Same things as above-->
-                </div>
-            </div>
+  <div class="b">
+    <!--Formats based body content-->
+    <!--borrowed from https://www.w3schools.com/howto/howto_css_login_form.asp-->
+    <h1> </h1>
+    <br><br>
+    <br><br>
+    <h1>Log in Here</h1>
+    <h2>Please log in here if you are an existing user.</h2>
+    <!--Lab 13-->
+    <form name="login" action="process_login" method="POST">
+      <div class="container"><br>
+        <input type="text" name="username" id="username" size="40" placeholder="Enter Username" required><br>
+        <!--Sets the input type to a textbox with credentials to allow user text-->
+        <input type="password" name="password" size="40" placeholder="Enter Password" onkeyup="" required><br>
+        <!--Sets the input to become a password and allows the return of a "password" to be used in further instances-->
+        <br>
+        <input type="submit" value="Login" name="login"><br>
+        <!--Sets the imput to return the login value as a "login" so we can refer to this data as a user login-->
+        <div style="margin-left: auto; margin-right: auto;">
+          <p>Register Here!</p>
+          <input type="button" name="newuser" value="New Users register Here"
+            onclick="window.location='./register.html' + document.location.search">
+          <!--Same things as above-->
         </div>
-        <!--borrowed from https://www.w3schools.com/howto/howto_css_login_form.asp-->
-</style>
-        </form>
-<script>
-login.action += document.location.search; //saves querystring from the products page so the information isnt lost. Went over in class 4/13/2021
-// Script to open and close sidebar
-function w3_open() {
-  document.getElementById("mySidebar").style.display = "block";
-}
- 
-function w3_close() {
-  document.getElementById("mySidebar").style.display = "none";
-}
-</script>
-</body>
-    </div>
+      </div>
+  </div>
+  <!--borrowed from https://www.w3schools.com/howto/howto_css_login_form.asp-->
+  </style>
+  </form>
+  <script>
+    login.action += document.location.search; //saves querystring from the products page so the information isnt lost. Went over in class 4/13/2021
+    // Script to open and close sidebar
+    function w3_open() {
+      document.getElementById("mySidebar").style.display = "block";
+    }
+
+    function w3_close() {
+      document.getElementById("mySidebar").style.display = "none";
+    }
+  </script>
+  </body>
+</div>
+
 </html>

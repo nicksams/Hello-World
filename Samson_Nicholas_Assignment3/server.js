@@ -8,9 +8,9 @@ var products = data.products; //assigns the product data to check if values are 
 var filename = 'user_data.json'; //loads the file named user_data.json and the contents of this said file. 
 var fs = require('fs'); // loads the file system package
 var cookieParser = require('cookie-parser'); //don't forget to install//
-app.use(cookieParser());
-var session = require('express-session');
-
+app.use(cookieParser()); // loads up cookie parser
+var session = require('express-session'); // loads up session
+var nodemailer = require("nodemailer"); // required for sending mailer
 //play with cookies 
 app.get('/set_cookie', function (req, res, next) {
     //console.log(req.cookies);
@@ -31,11 +31,11 @@ app.get('/use_cookie', function (req, res, next) {
     }
     next();
 });
-
+//loads session
 app.use(session({
     secret: "ITM352 rocks!"
 }));
-
+//loads fileservice
 if (fs.existsSync(filename)) {
     var stats = fs.statSync(filename) //gets stats from file
     console.log(filename + 'has' + stats.size + 'characters');
@@ -45,9 +45,9 @@ if (fs.existsSync(filename)) {
     console.log(filename + 'does not exist!');
 }
 
-
+//just an app.all function
 app.all('*', function (request, response, next) {
-    console.log(request);
+    // console.log(request);
     console.log(request.method, request.path);
     next();
 })
@@ -61,7 +61,7 @@ if (fs.existsSync(filename)) {//checks that there is a given path to that exists
     console.log(`${user_data} dose not exist!`)//do this if the there is no file we are refering to
     exit();//finally exits the application
 }
-
+//IsNonNegInt function for use of checking the values on the server
 function isNonNegInt(q, return_errors = false) {
     errors = []; // assume no errors at first
     if (q == '') q = 0; // handle blank inputs as if they are 0
@@ -73,9 +73,10 @@ function isNonNegInt(q, return_errors = false) {
 
 //we must change everything that had params get and params has because we do not have anything to get and has from because the server is processing this information therefor we have to request the body of the homepage that we assigned to params and formulate our invoice from there.
 app.use(myParser.urlencoded({ extended: true }));
+app.use(myParser.json());//added the json parser to parse json data
 app.post("/process_form", function (request, response) { // this is the function that if we recieve a request from the home page we will run this as a response
     params = request.body; //on this line we are setting the body of our form that we previously set in our home page to the params.
-    
+
     // form was submitted so check that quantities are valid then redirect to invoice if ok.
     if (typeof params['purchase_submit'] != 'undefined') { // if the params which is the body of our home page, if there is soemthing that is not undefined then run the code below, purchase submit was set from the button on our homepage. 
         has_errors = false; // assume quantities are valid from the start
@@ -107,23 +108,46 @@ app.post("/process_form", function (request, response) { // this is the function
         }
     }
 });
-
+//add to cart function, professor port helped alot
 app.post("/addtocart", function (request, response) {
-    itemdata = request.body;
-    if(typeof request.session.cart == "undefined"){
-        request.session.cart = [];
+    console.log(request.body);//requests the body
+    itemdata = request.body;//sets the itemdata as the body
+    //if the data is valid after running through the isnonnegint function add the items to cart, if it is not return the isnonnegint function errors
+    if (isNonNegInt(itemdata.quantity)) {
+        if (typeof request.session.cart == "undefined") {
+            request.session.cart = {}; // if there is no cart make a cart
+        }
+        if (typeof request.session.cart[itemdata.producttype] == "undefined") {
+            request.session.cart[itemdata.producttype] = []; //if there is no product data for this variable product key create a product array for it
+        }
+        if (typeof request.session.cart[itemdata.producttype][itemdata.productindex] == "undefined") {//if the product type is not there create an index of 0 for it so we now have a space to add the product
+            request.session.cart[itemdata.producttype][itemdata.productindex] = 0;
+        }
+        request.session.cart[itemdata.producttype][itemdata.productindex] += parseInt(itemdata.quantity); //parse the quantity to an integer or else we will be adding strings 
+        response.send(`Added ${itemdata.quantity} ${itemdata.producttype}'s to cart`);// respond that you have added the type of product with the quanitity to cart
+        console.log(request.session.cart);
+    } else {
+        response.send(`Invalid Quantity`); // responds with invalid if the isnonnegint function returns true
     }
-    request.session.cart.push(itemdata);
-    response.send(`Added ${itemdata.quantity} ${itemdata.product} to cart`);
-    console.log(request.session.cart);
-});
 
+});
+//load cart function so we will use this to load the cart data to the server, help from professor
 app.post("/loadcart", function (request, response) {
-    if (typeof request.session.cart == 'undefined') {
+    if (typeof request.session.cart == "undefined") {//if we didnt request the cart data create an object for it so will now have the cart_data object
         request.session.cart = {};
     }
-    response.json(request.session.cart);
+    response.json(request.session.cart)//responds with the cart data as json
+
 });
+//logout function
+app.get("/logout", function (request, response) {
+    response.clearCookie('username');//clears the cookie of username that we requested from the server when logging in or registering
+    str = `<script>alert("${request.cookies['username']} is logged out"); location.href="./index.html";</script>`; //save the script value of the user is logged out and redirect to a variable to so when the user logs out it will run this script to logout and redirect
+    response.send(str); //sends the variable
+    request.session.destroy(); // finally destroys session with cart info if use had items in card and cookie
+
+});
+
 //From Lab 14 and 4/15/2021 Screencast
 //Process Login
 app.post("/process_login", function (request, response) {
@@ -133,8 +157,8 @@ app.post("/process_login", function (request, response) {
         if (user_data[ClientUsername].password == request.body.password) {//next checks the samething as before but then checks if the password is now matching in our database
             request.query.username = ClientUsername;
             request.query.name = user_data[request.query.username].name
-            response.cookie('username', ClientUsername);
-            response.redirect('./Cart.html?' + queryString.stringify(request.query));//sending them to the invoice page because they logged in sucessfully, we have to send them with the querystring or else the quantitys that we put in the order_page would not load otherwise 
+            response.cookie('username', ClientUsername); //sends the cookie of username to session
+            response.redirect('./productdisplay.html?pkey=Ficus');//sending them to the invoice page because they logged in sucessfully, we have to send them with the querystring or else the quantitys that we put in the order_page would not load otherwise 
             return;
         } else {//if user or password were incorrect calls to login error and displays error message in console 
             request.query.username = ClientUsername;//sets the username to what the user inpuy
@@ -147,8 +171,6 @@ app.post("/process_login", function (request, response) {
     }
     response.redirect('./login.html?' + queryString.stringify(request.query));//redirects you back to the login page if you have an error
 });
-
-
 
 //Process Registration
 app.post("/process_register", function (request, response) {
@@ -180,12 +202,15 @@ app.post("/process_register", function (request, response) {
     if (errors.length == 0) {
         var username = POST["username"];//sets the username so we can refer back to the user during the validation step
         user_data[username] = {};//sets up the object for the user to input their credentials
-        user_data[username].name = username;//Post username = usernamedata_username
+        user_data[username].name = POST['username'];//Post username = usernamedata_username
         user_data[username].password = POST['password'];//Post password = userdata_password
         user_data[username].email = POST['email'];//same as above
         data = JSON.stringify(user_data);// converts the data back to json beccause we need to save it to the json user data file.
         fs.writeFileSync(filename, data, "utf-8");// finally writes the data back
-        response.redirect('./Cart.html?' + queryString.stringify(request.query));//redirects back to the order_display page with the querystring just like the login post but rather the register.
+        ClientUsername = user_data[username]['name'];
+        ClientEmail = user_data[username]['email'];
+        response.cookie("username", ClientUsername).send; //sends cookie to session 
+        response.redirect('./productdisplay.html?pkey=Ficus');//redirects back to the ficus page to start shopping!
     }
 
     else {
@@ -196,6 +221,47 @@ app.post("/process_register", function (request, response) {
 
     }
 });
-
+//checkout function
+app.post("/checkout", function (request, response) {
+    /* var invoice_str = `Thank you for your order!<table border><th>Quantity</th><th>Item</th>`;
+     var shopping_cart = request.session.cart;
+     for (pkey in products) {
+         for (i = 0; i < products[pkey].length; i++) {
+             if (typeof shopping_cart[pkey] == 'undefined') continue;
+             qty = shopping_cart[pkey][i];
+             if (qty > 0) {
+                 invoice_str += `<tr><td>${qty}</td><td>${products[pkey][i].brand}</td><tr>`;
+             }
+         }
+     }
+     invoice_str += '</table>';
+     */
+    //decodes the invoice that was encoded
+    invoice_str = decodeURI(request.body.invoicestring);
+    var transporter = nodemailer.createTransport({
+        host: "mail.hawaii.edu",
+        port: 25,
+        secure: false,
+        tls: {
+            rejectUnauthorized: false
+        }
+    });
+    var user_email = 'thankyouforyourorder@fake.com';
+    var mailOptions = {
+        from: 'nsamson@fake.com',
+        to: user_email,
+        subject: 'Enjoy Your Plants!',
+        html: invoice_str
+    };
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            invoice_str += '<br>Issue with sending plants, invoice not sent';
+        } else {
+            invoice_str += '<br>Email sent!, Enjoy your Plants!';
+        }
+        request.session.destroy(); //destroys session
+        response.send(invoice_str);
+    });
+});
 app.use(express.static('.'));
 app.listen(8080, () => console.log(`listening on port 8080`));// sets express to listen on port 8080

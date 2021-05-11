@@ -10,7 +10,7 @@ var fs = require('fs'); // loads the file system package
 var cookieParser = require('cookie-parser'); //don't forget to install//
 app.use(cookieParser());
 var session = require('express-session');
-var nodemailer = require("nodemailer");
+
 //play with cookies 
 app.get('/set_cookie', function (req, res, next) {
     //console.log(req.cookies);
@@ -47,7 +47,7 @@ if (fs.existsSync(filename)) {
 
 
 app.all('*', function (request, response, next) {
-    // console.log(request);
+    console.log(request);
     console.log(request.method, request.path);
     next();
 })
@@ -73,10 +73,9 @@ function isNonNegInt(q, return_errors = false) {
 
 //we must change everything that had params get and params has because we do not have anything to get and has from because the server is processing this information therefor we have to request the body of the homepage that we assigned to params and formulate our invoice from there.
 app.use(myParser.urlencoded({ extended: true }));
-app.use(myParser.json());
 app.post("/process_form", function (request, response) { // this is the function that if we recieve a request from the home page we will run this as a response
     params = request.body; //on this line we are setting the body of our form that we previously set in our home page to the params.
-
+    
     // form was submitted so check that quantities are valid then redirect to invoice if ok.
     if (typeof params['purchase_submit'] != 'undefined') { // if the params which is the body of our home page, if there is soemthing that is not undefined then run the code below, purchase submit was set from the button on our homepage. 
         has_errors = false; // assume quantities are valid from the start
@@ -110,42 +109,21 @@ app.post("/process_form", function (request, response) { // this is the function
 });
 
 app.post("/addtocart", function (request, response) {
-    console.log(request.body);
     itemdata = request.body;
-    if (isNonNegInt(itemdata.quantity)) {
-        if (typeof request.session.cart == "undefined") {
-            request.session.cart = {};
-        }
-        if (typeof request.session.cart[itemdata.producttype] == "undefined") {
-            request.session.cart[itemdata.producttype] = [];
-        }
-        if(typeof request.session.cart[itemdata.producttype][itemdata.productindex] == "undefined"){
-            request.session.cart[itemdata.producttype][itemdata.productindex] = 0;
-        }
-        request.session.cart[itemdata.producttype][itemdata.productindex] += parseInt(itemdata.quantity);
-        response.send(`Added ${itemdata.quantity} ${itemdata.producttype}'s to cart`);
-        console.log(request.session.cart);
-    }else{
-        response.send(`Invalid Quantity`);
+    if(typeof request.session.cart == "undefined"){
+        request.session.cart = [];
     }
-
+    request.session.cart.push(itemdata);
+    response.send(`Added ${itemdata.quantity} ${itemdata.product} to cart`);
+    console.log(request.session.cart);
 });
 
 app.post("/loadcart", function (request, response) {
-    if (typeof request.session.cart == "undefined") {
+    if (typeof request.session.cart == 'undefined') {
         request.session.cart = {};
     }
-    response.json(request.session.cart)
-
+    response.json(request.session.cart);
 });
-
-app.get("/logout", function (request, response) {
-    response.clearCookie('username');
-    str = `<script>alert("${request.cookies['username']} is logged out"); location.href="./index.html";</script>`;
-    response.send(str);
-
-});
-
 //From Lab 14 and 4/15/2021 Screencast
 //Process Login
 app.post("/process_login", function (request, response) {
@@ -156,7 +134,7 @@ app.post("/process_login", function (request, response) {
             request.query.username = ClientUsername;
             request.query.name = user_data[request.query.username].name
             response.cookie('username', ClientUsername);
-            response.redirect('./productdisplay.html?pkey=Ficus');//sending them to the invoice page because they logged in sucessfully, we have to send them with the querystring or else the quantitys that we put in the order_page would not load otherwise 
+            response.redirect('./Cart.html?' + queryString.stringify(request.query));//sending them to the invoice page because they logged in sucessfully, we have to send them with the querystring or else the quantitys that we put in the order_page would not load otherwise 
             return;
         } else {//if user or password were incorrect calls to login error and displays error message in console 
             request.query.username = ClientUsername;//sets the username to what the user inpuy
@@ -169,6 +147,8 @@ app.post("/process_login", function (request, response) {
     }
     response.redirect('./login.html?' + queryString.stringify(request.query));//redirects you back to the login page if you have an error
 });
+
+
 
 //Process Registration
 app.post("/process_register", function (request, response) {
@@ -200,15 +180,12 @@ app.post("/process_register", function (request, response) {
     if (errors.length == 0) {
         var username = POST["username"];//sets the username so we can refer back to the user during the validation step
         user_data[username] = {};//sets up the object for the user to input their credentials
-        user_data[username].name = POST['username'];//Post username = usernamedata_username
+        user_data[username].name = username;//Post username = usernamedata_username
         user_data[username].password = POST['password'];//Post password = userdata_password
         user_data[username].email = POST['email'];//same as above
         data = JSON.stringify(user_data);// converts the data back to json beccause we need to save it to the json user data file.
         fs.writeFileSync(filename, data, "utf-8");// finally writes the data back
-        ClientUsername = user_data[username]['name'];
-        ClientEmail = user_data[username]['email'];
-        response.cookie("username", ClientUsername).send;
-        response.redirect('./productdisplay.html?pkey=Ficus');//redirects back to the order_display page with the querystring just like the login post but rather the register.
+        response.redirect('./Cart.html?' + queryString.stringify(request.query));//redirects back to the order_display page with the querystring just like the login post but rather the register.
     }
 
     else {
@@ -219,45 +196,6 @@ app.post("/process_register", function (request, response) {
 
     }
 });
-app.post("/checkout", function (request, response) {
-   /* var invoice_str = `Thank you for your order!<table border><th>Quantity</th><th>Item</th>`;
-    var shopping_cart = request.session.cart;
-    for (pkey in products) {
-        for (i = 0; i < products[pkey].length; i++) {
-            if (typeof shopping_cart[pkey] == 'undefined') continue;
-            qty = shopping_cart[pkey][i];
-            if (qty > 0) {
-                invoice_str += `<tr><td>${qty}</td><td>${products[pkey][i].brand}</td><tr>`;
-            }
-        }
-    }
-    invoice_str += '</table>';
-    */
-   invoice_str=decodeURI(request.body.invoicestring);
-    var transporter = nodemailer.createTransport({
-        host: "mail.hawaii.edu",
-        port: 25,
-        secure: false,
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
-    var user_email = 'thankyouforyourorder@fake.com';
-    var mailOptions = {
-        from: 'nsamson@fake.com',
-        to: user_email,
-        subject: 'Enjoy Your Plants!',
-        html: invoice_str
-    };
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            invoice_str += '<br>Issue with sending plants, invoice not sent';
-        } else {
-            invoice_str += '<br>Enjoy your Plants';
-        }
-        request.session.destroy();
-        response.send(invoice_str);
-    });
-});
+
 app.use(express.static('.'));
 app.listen(8080, () => console.log(`listening on port 8080`));// sets express to listen on port 8080
