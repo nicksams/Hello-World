@@ -10,15 +10,21 @@
 <script>
 let params = (new URL(document.location)).searchParams; // get the query string which has the form data
 var producttype = params.get("pkey");
+window.onload = function (){
+if( typeof cart_data[producttype] != "undefined"){
+  for(i in cart_data[producttype]){
+    document.getElementById(`quantity${i}`).value = cart_data[producttype][i];
+  }
+}
+};
 
- function checkQuantityTextbox(theTextbox) {
+function checkQuantityTextbox(theTextbox) {
       errs = isNonNegInt(theTextbox.value, true); // runs  isNonNegInt on the thetextbox value and if resutns true contines.
       if (errs.length == 0) errs = ['You want:'];// if there are no errors set the value to 'You Want'
       if (theTextbox.value.trim() == '') errs = ['Quantity:'];
-      document.getElementById(theTextbox.name + '_label').innerHTML=errs.join(',');//Finally sets the textbox to what the errors are or are not found.
+      document.getElementById(theTextbox.id + '_label').innerHTML=errs.join(',');//Finally sets the textbox to what the errors are or are not found.
     }
-
- function isNonNegInt(q, return_errors = false) {
+function isNonNegInt(q, return_errors = false) {
         errors = []; // assume no errors at first
         if(q == '') q =0; // handle blank inputs as if they are 0
         if (Number(q) != q) errors.push('<font color="red">Not a number!</font>'); // Check if string is a number value
@@ -26,56 +32,6 @@ var producttype = params.get("pkey");
         else if (parseInt(q) != q) errors.push('<font color="red">Not an integer!</font>'); // Check that it is an integer
         return return_errors ? errors : (errors.length == 0);
     }  
-  window.onload = function () {
-  
-        // form was submitted so check that quantities are valid then redirect to invoice if ok.
-        if (params.has('purchase_submit')) {
-            has_errors = false; // assume quantities are valid from the start
-            total_qty = 0; // need to check if something was selected so we will look if the total > 0
-            for (i = 0; i < products.length; i++) {
-                if (params.has(`quantity${i}`)) {//checks if the paramaters 'has' the value of the quantity of i and then continues
-                    a_qty = params.get(`quantity${i}`);// if there is a quantitiy sets the value of that quantity to the a_qty
-                    // make textboxes sticky in case of invalid data
-                    product_selection_form[`quantity${i}`].value = a_qty; // finally sets the quantity to the area in the form
-                    total_qty += a_qty;  // adds the current quantity to the total quantities there are.
-                    if(!isNonNegInt(a_qty)) { //if the value returns false then this will run instead
-                        has_errors = true; // oops, invalid quantity
-                        checkQuantityTextbox(product_selection_form[`quantity${i}`]); // show where the error is
-                    }
-                }
-            }
-            // Now respond to errors or redirect to invoice if all is ok
-            if(has_errors) {// if the above runs and it returns has_errors we will run this alert
-                alert("Please enter only valid quantities!");
-            } else if(total_qty == 0) { // no quantity selections, just give a general alert
-                alert("Please select some quantities!");
-            } else { // all good to go!
-                window.location = `./order_display.html${document.location.search}`; //finally the window will load the order_display html where the document is pushed and processed to yourself.
-                window.stop;
-            }
-        }
-    }
-function savetocart(index){
-  var productdata={};
-      productdata.producttype= producttype;
-      productdata.productindex=index;
-      productdata.quantity=document.getElementById('quantity'+ index).value;
-      
-      console.log(
-      productdata
-    )
-    fetch('addtocart', {
-    method: 'POST',
-    body: new URLSearchParams(
-      productdata
-    )
-}).then(response => response.text())
-        .then((response) => {
-           alert(response);      
-        })
-        .catch(err => console.log(err))
-    } 
-    
 function getCookie(name = '') {
         let cookies = document.cookie;
         let cookiestore = {};
@@ -96,11 +52,56 @@ function getCookie(name = '') {
 
         return (name !== '' ? cookiestore[name] : cookiestore);
     }
+function savetocart(index){
+  var productdata={};
+      productdata.producttype= producttype;
+      productdata.productindex=index;
+      productdata.quantity=document.getElementById('quantity'+ index).value;
+      if(typeof cart_data[producttype]=="undefined"){
+        cart_data[producttype]=[];
+      }
+      if(typeof cart_data[producttype][index]=="undefined"){
+        cart_data[producttype][index]=0;
+      }
+      document.getElementById('quantity'+ index).value = parseInt(document.getElementById('quantity'+ index).value)+cart_data[producttype][index];
+      console.log(
+      productdata
+    )
+    fetch('addtocart', {
+    method: 'POST',
+    body: new URLSearchParams(
+      productdata
+    )
+}).then(response => response.text())
+        .then((response) => {
+           alert(response); 
+                
+        })
+        .catch(err => console.log(err))
+    
+  }
+function loadJSON(service, callback) {   
+    var xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+    xobj.open('POST', service, false);
+    xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4 && xobj.status == "200") {
+            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+            callback(xobj.responseText);
+          }
+    };
+    xobj.send(null);  
+ }
+  var cart_data ={};
+  loadJSON('loadcart', function (response) {
+    cart_data = JSON.parse(response);
+  });
+  console.log(cart_data);
 var cookieToEdit = getCookie('username');
 var x = cookieToEdit.replace('username=', '');
 var display = x.replace('%20', ' ');
-</script>
 
+</script>
 <style>
 body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
 .w3-bar-block .w3-bar-item {padding:20px}
@@ -165,27 +166,36 @@ div.e {
 <nav class="w3-sidebar w3-bar-block w3-card w3-top w3-xlarge w3-animate-left" style="display:none;z-index:2;width:40%;min-width:300px" id="mySidebar">
   <a href="javascript:void(0)" onclick="w3_close()"
   class="w3-bar-item w3-button">Close Menu</a>
-  <a href="" onclick="w3_close()" class="w3-bar-item w3-button">About</a>
 <script>
   for(let ptype in products){
  document.write(`<a href="./productdisplay.html?pkey=${ptype}" onclick="w3_close()" class="w3-bar-item w3-button">${ptype}</a>`) 
 }
 </script>
+
   <a href="Cart.html" onclick="w3_close()" class="w3-bar-item w3-button">Cart</a>
-  <a href="Login.html" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
+<script>
+  if(getCookie('username') == undefined){
+  document.write(`<a href="Login.html" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>`);
+  }else{
+  document.write(`<a href="logout" onclick="w3_close()" class="w3-bar-item w3-button">Logout ${getCookie('username')}</a>`)  
+  }
+</script>
+<script>
+if(getCookie('username') == undefined){
   <a href="Register.html" onclick="w3_close()" class="w3-bar-item w3-button">Register</a>
+}else{
+  <a href=" " onclick="w3_close()" class="w3-bar-item w3-button"></a>
+}
+</script>
 </nav>
 
 <!-- Top menu -->
 <div class="w3-top">
   <div class="w3-white w3-xlarge" style="max-width:1200px;margin:auto">
     <div class="w3-button w3-padding-16 w3-left" onclick="w3_open()">☰</div>
-    <script>
-    if (getCookie('username') != undefined) {
-      <div class="w3-right w3-padding-16">x</div>
-    }
-    </script>
+    <div class="w3-right w3-padding-16">❀♥❀♥❀</div>
     <div class="w3-center w3-padding-16">✿Welcome!✿</div>
+   
   </div>
 </div>
 
@@ -202,12 +212,12 @@ div.e {
               <br><br>
             <form name="Product${i}" id="product${i}" class="product_listing">   
                             <h2 id = brand${i} >${products[producttype][i].brand}</h2>
-                            <p  id = price${i}  >${products[producttype][i].price}</p>
+                            <p>Price:</p><p  id = price${i}  >${products[producttype][i].price}</p>
                             <img src="${products[producttype][i].image}" alt=${products[producttype][i].brand} style=width="200" height="200" float:left> <br><br>
                             <span id="quantity${i}_span"}"></span><br><br>
                             <label id="quantity${i}_label"}">Quantity</label><br><br>
                             <input type="text" placeholder="0" id="quantity${i}" name="textbox${i}" onkeyup="checkQuantityTextbox(this);">
-                            <input type="button" value="Add to Cart" onclick="savetocart(${i});document.getElementById('quantity${i}').value = ''">
+                            <input type="button" name ="addtocart" value="Add to Cart" onclick="savetocart(${i});">
              </form>
             </div>          
                     `);
@@ -218,48 +228,7 @@ div.e {
         </form>
 </div>
 
-<!--
-<div class = "d">
-  <h1>
-  Ficus Ideas!
-</h1>  
-</div>
-
-<script>
-  for(i=0; i<ficus.length;i++) { 
-  document.write(`
-  <div class ="b">
-  </div>
-  <div class = "a">
-  <img src= images/ficus1.jpg alt=${products[1].brand} style=width="200" height="200" float:left>
-  </div>
-  <div class = "b">
-  <img src= images/ficus2.jpg alt=${products[1].brand} style=width="200" height="200" float:left>
-  </div>
-  <div class = "c">
-  <img src= images/ficus3.jpg alt=${products[1].brand} style=width="200" height="200" float:left>
-  </div>
-  `);
-}
-</script>
--->
-<!--
-//<div class = "e">
-//<h5>
-//Ficus is one of the most popular trees for indoor Bonsai. It is an excellent tree for beginners and pros alike. Virtually care free; they tolerate low light and humidity of a heated or air-conditioned house. The “banyan” style roots are commonly trained in a root-over-rock style.
-//</h5>  
-//</div>
--->
-
 </hr>
-<!--
-<input type="button" value="Add to Cart" onclick="savetocart();">Add to Cart! </input>
-
-    <div class="w3-main w3-content w3-padding" style="text-align: center; margin-top: 10px;"> 
-    <button type="submit" onclick="add_to_cart">Calculate Total!</button>
-    </div>
-  -->
-  
   <hr id="about">
 
   <!-- About Section -->
@@ -268,12 +237,15 @@ div.e {
     <span id="name_display" class="name_display">
     <script>
     if (getCookie('username') != undefined) {
-    document.getElementById('name_display').innerHTML = `Welcome ${display}`;
+    document.getElementById('name_display').innerHTML = `Welcome ${display}!`;
     } else {
-    document.getElementById('name_display').innerHTML = "Hello, please log in!";
+    document.getElementById('name_display').innerHTML = "Hello, please log in or register!";
     };
     </script>
-
+<br><br>
+<br><br>
+<br><br>
+<h3>Me the Loaf</h3><br>
     <img src="images/sleepy.JPG" alt="Me" class="w3-image" style="display:block;margin:auto" width="200" height="200">
     <div class="w3-padding-32">
       <h4><b>Bark!</b></h4>

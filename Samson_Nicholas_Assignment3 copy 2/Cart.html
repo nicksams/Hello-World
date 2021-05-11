@@ -19,7 +19,6 @@
   });
   console.log(cart_data);
 </script>
-</script>
       
       <!DOCTYPE html>
       <html lang="en">
@@ -37,7 +36,7 @@
     left: 50%;
     margin-top: -225px;
     margin-left: -200px;
-    color: white
+    color: black
     } 
         </style>
       
@@ -47,7 +46,7 @@
           <nav class="w3-sidebar w3-bar-block w3-card w3-top w3-xlarge w3-animate-left" style="display:none;z-index:2;width:40%;min-width:300px" id="mySidebar">
             <a href="javascript:void(0)" onclick="w3_close()"
             class="w3-bar-item w3-button">Close Menu</a>
-            <a href="" onclick="w3_close()" class="w3-bar-item w3-button">About</a>
+            <a href="./index.html" onclick="w3_close()" class="w3-bar-item w3-button">Home</a>
           <script>
             for(let ptype in products){
            document.write(`<a href="./productdisplay.html?pkey=${ptype}" onclick="w3_close()" class="w3-bar-item w3-button">${ptype}</a>`) 
@@ -67,6 +66,13 @@
             </div>
           </div>
         <div class ="b">
+          <div class ="b">
+            <h3>Added products go here!</h3>
+            <p>Use top left key to access products!</p>
+          </div>
+        <script>
+          invoicestr = `
+    
         <table border="2">
           <tbody>
             <tr>
@@ -75,7 +81,8 @@
               <th style="text-align: center;" width="13%">price</th>
               <th style="text-align: center;" width="54%">extended price</th>
             </tr>
-            <script>
+            `;
+            
               subtotal = 0;
               for(let ptype in cart_data){             
                for (let i in cart_data[ptype]) {
@@ -83,7 +90,7 @@
                 if (qty > 0) {
                   var extended_price = qty * products[ptype][i].price;
                   subtotal = extended_price + subtotal;
-                  document.write(`
+                  invoicestr+=`
             <tr>
               <td width="43%">${products[ptype][i].brand}</td>
               <td align="center" width="11%">${qty}</td>
@@ -91,7 +98,7 @@
               <td width="54%">\$${extended_price}</td>
         </tr>
             </tr>
-            `);
+            `;
                 }
               }
             }
@@ -112,48 +119,65 @@
       
               // Compute grand total
               var total = subtotal + tax + shipping;
-            </script>
+            invoicestr+=`
             <tr>
               <td colspan="4" width="100%">&nbsp;</td>
             </tr>
             <tr>
               <td style="text-align: center;" colspan="3" width="67%">Sub-total</td>
               <td width="54%">$
-                <script>document.write(subtotal);</script>
+                ${subtotal}
               </td>
             </tr>
             <tr>
               <td style="text-align: center;" colspan="3" width="67%"><span style="font-family: arial;">Tax @
-                  <script>document.write(100 * tax_rate);</script>%</span></td>
+                  ${100 * tax_rate}%</span></td>
               <td width="54%">$
-                <script>document.write(tax.toFixed(2));</script>
+                ${tax.toFixed(2)}
               </td>
             </tr>
             <tr>
               <td style="text-align: center;" colspan="3" width="67%">Shipping</span></td>
               <td width="54%">$
-                <script>document.write(shipping.toFixed(2));</script>
+                ${shipping.toFixed(2)}
               </td>
             </tr>
             <tr>
               <td style="text-align: center;" colspan="3" width="67%"><strong>Total</strong></td>
               <td width="54%"><strong>$
-                  <script>document.write(total.toFixed(2));</script></strong></td>
+                  ${total.toFixed(2)}</strong></td>
             </tr>
           </tbody>
         </table>
-        <div>
           <br><b>
-            OUR SHIPPING POLICY IS:A subtotal $0 - $49.99 will be $2 shipping
+            OUR SHIPPING POLICY IS:
             <br>
-            A subtotal $50 - $99.99 will be $5 shipping
+            A subtotal $0 - $49.99 will be $2 shipping.
             <br>
-            Subtotals over $100 will be charged 5% of the subtotal amount
+            A subtotal $50 - $99.99 will be $5 shipping.
+            <br>
+            Subtotals over $100 will be charged 5% extra.
           </b> </div>
         </div>
+        `;
+        document.write(invoicestr);
+        </script>
+
+        <br><br>
+        <br><br>
+        <br><br>
+        <br><br>
+        <br><br>
+        <br><br>
+        <form action="/checkout" method=POST>
+          <script>
+          document.write(`<input name="invoicestring" type="hidden" value="${encodeURI(invoicestr)}">`);
+          </script>
+          <div class="w3-main w3-content w3-padding" style="text-align: center; margin-top: 500px;"> 
+          <button type="submit" name="purchase_submit">Checkout!</button>
+          </form>
       </body>
-      <script>
-        // Script to open and close sidebar
+     <script>
         function w3_open() {
           document.getElementById("mySidebar").style.display = "block";
         }
